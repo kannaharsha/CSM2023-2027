@@ -1,16 +1,52 @@
-# React + Vite
+# CSM Farewell Yearbook 2023-2027 🎓✨
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A premium, interactive digital yearbook created for the CSM Batch of 2023-2027. This microsite serves as a digital time capsule to preserve memories, celebrate friendships, and honor our journey together.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **🎓 Legend Gallery**: A searchable and paginated grid featuring every member of the batch.
+- **💖 Wall of Love**: A place to leave public messages, appreciation, and memories for friends.
+- **🤫 Anonymous Confessions**: Say what you never could in a safe, anonymous space.
+- **🏆 Batch Awards**: Live voting system for various fun categories (Class Clown, Future CEO, etc.).
+- **📸 Memory Lane**: A collective gallery where batchmates can add and view shared moments.
+- **✨ Premium UI**: Modern glassmorphism design with smooth animations and interactive particles.
 
-## React Compiler
+## 🛠️ Technology Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: React + Vite
+- **Styling**: Vanilla CSS (Premium Custom Design)
+- **Persistence**: `localStorage` (Privacy-focused, local data storage)
+- **Animations**: CSS Keyframes & Intersection Observer API
 
-## Expanding the ESLint configuration
+## 💻 Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/kannaharsha/CSM2023-2027.git
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+4. **Build for production:**
+   ```bash
+   npm run build
+   ```
+
+## 📝 Note on Data
+
+This version of the yearbook uses **LocalStorage** for all interactive features (votes, messages, confessions). This means:
+- Data is stored locally in your browser.
+- No external database (like Supabase) is required.
+- Ideal for personal viewing or local demonstrations.
+
+---
+
+*Made with ❤️ for the CSM Batch of 2023-2027*
