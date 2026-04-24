@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { students } from '../data/students';
 import { localDB } from '../lib/localDB';
 import CustomSelect from './CustomSelect';
 
@@ -16,6 +15,7 @@ const BatchAwards = () => {
   const [loading, setLoading] = useState(true);
   const [voterId, setVoterId] = useState('');
   const [showResults, setShowResults] = useState(false);
+  const [students, setStudents] = useState([]);
 
   const totalVotes = Object.values(votes).reduce((sum, categoryVotes) => {
     return sum + Object.values(categoryVotes).reduce((a, b) => a + b, 0);
@@ -34,8 +34,14 @@ const BatchAwards = () => {
     const savedMyVotes = JSON.parse(localStorage.getItem('my_batch_votes')) || {};
     setMyVotes(savedMyVotes);
 
+    fetchStudents();
     fetchVotes();
   }, []);
+
+  const fetchStudents = async () => {
+    const { data } = await localDB.from('students').select('*');
+    if (data) setStudents(data);
+  };
 
   const fetchVotes = async () => {
     setLoading(true);
@@ -56,38 +62,54 @@ const BatchAwards = () => {
     setLoading(false);
   };
 
-  const handleVote = async (category, studentId) => {
+  const handleVote = (category, studentId) => {
     if (!studentId) return;
     
-    // Update local state for immediate feedback
+    // Only update local state for immediate feedback
     const newMyVotes = { ...myVotes, [category]: studentId };
     setMyVotes(newMyVotes);
     localStorage.setItem('my_batch_votes', JSON.stringify(newMyVotes));
+  };
 
-    // Update Supabase
-    // We try to delete existing vote for this user in this category first (if we had voter_id)
-    // For simplicity, we just insert. If we want unique votes per user, we need a unique constraint in DB.
+  const submitAllVotes = async () => {
+    setLoading(true);
     
-    // Note: The schema.sql I provided has a UNIQUE(category, voter_id) constraint.
-    // So we should use upsert or delete then insert.
-    
-    const { error } = await localDB
-      .from('votes')
-      .upsert({ 
-        category, 
-        student_id: studentId, 
-        voter_id: voterId 
-      }, { onConflict: 'category,voter_id' });
+    let hasError = false;
+    let errorMessage = '';
 
-    if (!error) {
-      fetchVotes();
+    // Insert all current votes into Supabase
+    for (const [category, studentId] of Object.entries(myVotes)) {
+      const { error } = await localDB
+        .from('votes')
+        .upsert({ 
+          category, 
+          student_id: studentId, 
+          voter_id: voterId 
+        }, { onConflict: 'category,voter_id' });
+
+      if (error) {
+        hasError = true;
+        errorMessage = error.message;
+      }
     }
+
+    if (hasError) {
+      alert("Error saving your votes: " + errorMessage + "\n\n(If it says RLS violated, please disable Row Level Security for 'votes' in Supabase!)");
+    } else {
+      alert("✅ All your votes have been successfully submitted!");
+      fetchVotes(); // Refresh leaderboard
+    }
+    setLoading(false);
   };
 
   const getTopResults = (category) => {
     if (!votes[category]) return [];
     const sorted = Object.entries(votes[category]).sort((a, b) => b[1] - a[1]);
-    return sorted.slice(0, 3).map(([id, count]) => {
+    
+    // Slice to top 1 as requested
+    const top1 = sorted.slice(0, 1);
+    
+    return top1.map(([id, count]) => {
       const student = students.find(s => s.id === id);
       return student ? { ...student, count } : null;
     }).filter(Boolean);
@@ -139,55 +161,51 @@ const BatchAwards = () => {
                 
                 <h3 style={{ color: '#fff', textAlign: 'center', fontSize: '1.2rem', marginBottom: '1.5rem', fontFamily: 'var(--font-display)' }}>{category}</h3>
                 
-                <div className="award-flex-container">
-                  {/* Results section */}
-                  <div style={{ flex: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '130px' }}>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--secondary)', textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                      {showResults ? 'Leaderboard' : 'Results'}
-                    </p>
-                    
-                    {!showResults ? (
-                      <div className="pop-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem' }}>
-                        <span style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔒</span>
-                        Hidden until revealed
-                      </div>
-                    ) : topResults.length > 0 ? (
-                      <div className="pop-in" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
-                        {topResults.map((res, i) => (
-                          <div key={res.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: i === 0 ? 1 : 0.7, fontSize: i === 0 ? '1rem' : '0.85rem' }}>
-                            <span style={{ color: i === 0 ? 'gold' : i === 1 ? 'silver' : '#cd7f32' }}>
-                              {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
-                            </span>
-                            <span style={{ color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
-                              {res.name}
-                            </span>
-                            <span style={{ color: 'var(--secondary)' }}>({res.count})</span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}>
-                        No votes yet
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="award-divider"></div>
-
-                  {/* Your Vote */}
-                  <div style={{ flex: 1, textAlign: 'center' }}>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 'bold' }}>Your Vote</p>
+                <div className="award-results-container">
+                  {/* Your Vote Summary (Top) */}
+                  <div className="your-vote-header">
+                    <p className="mini-label">Your Vote</p>
                     {mySelectedStudent ? (
-                      <div className="pop-in">
-                        <div className="avatar-wrapper" style={{ width: '75px', height: '75px', minWidth: '75px', minHeight: '75px', border: '2px solid var(--primary)', background: 'rgba(0,0,0,0.3)' }}>
-                          <img src={mySelectedStudent.image} alt={mySelectedStudent.name} style={{ borderRadius: '50%' }} />
+                      <div className="mini-vote-badge pop-in">
+                        <div className="mini-avatar">
+                          <img src={mySelectedStudent.image} alt={mySelectedStudent.name} />
                         </div>
-                        <p style={{ fontSize: '0.9rem', fontWeight: 'bold', marginTop: '0.5rem', color: '#fff' }}>{mySelectedStudent.name}</p>
+                        <span className="mini-name">{mySelectedStudent.name}</span>
                       </div>
                     ) : (
-                      <div style={{ height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}>None selected</div>
+                      <span className="none-text">None selected</span>
                     )}
                   </div>
+
+                  {/* Leaderboard section (Only shown when results are requested) */}
+                  {showResults && (
+                    <div className="leaderboard-section pop-in">
+                      <p className="mini-label">Current Winner 👑</p>
+                      
+                      {topResults.length > 0 ? (
+                        <div className="winner-card pop-in">
+                          {topResults.map((result, i) => (
+                            <div key={i} className="leaderboard-item winner pop-in">
+                              <div className="item-left">
+                                <div className="item-avatar winner-avatar">
+                                  <img src={result.image} alt={result.name} />
+                                </div>
+                                <div className="item-info">
+                                  <div className="item-name winner-name">{result.name}</div>
+                                  <div className="item-id">#{result.id}</div>
+                                </div>
+                              </div>
+                              <div className="vote-count winner-count">
+                                {result.count} <span className="vote-text">votes</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="no-votes-placeholder">No votes yet</div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <CustomSelect 
@@ -199,6 +217,23 @@ const BatchAwards = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {!loading && !showResults && Object.keys(myVotes).length > 0 && (
+        <div className="reveal active" style={{ textAlign: 'center', marginTop: '4rem' }}>
+          <button 
+            className="btn btn-submit-premium" 
+            onClick={submitAllVotes}
+            disabled={loading}
+          >
+            <span className="btn-text">Submit All Votes</span>
+            <span className="btn-icon">🚀</span>
+            <div className="btn-glow"></div>
+          </button>
+          <p style={{ marginTop: '1rem', color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', fontStyle: 'italic' }}>
+            Ready to crown the legends?
+          </p>
         </div>
       )}
     </section>

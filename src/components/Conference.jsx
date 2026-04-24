@@ -18,7 +18,7 @@ const Conference = () => {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (!error) {
+    if (!error && data) {
       setConfessions(data);
     }
     setLoading(false);
@@ -30,7 +30,9 @@ const Conference = () => {
     
     const { data, error } = await localDB
       .from('confessions')
-      .insert([{ text, date_display: new Date().toLocaleDateString() }])
+      .insert([{ 
+        message: text 
+      }])
       .select();
 
     if (!error && data) {
@@ -39,6 +41,8 @@ const Conference = () => {
       setText('');
       setAnimatingId(newConfession.id);
       setTimeout(() => setAnimatingId(null), 1000);
+    } else if (error) {
+      alert("Error dropping confession: " + error.message + "\n\n(If it says RLS violated, please disable Row Level Security for 'confessions' in Supabase!)");
     }
   };
 
@@ -78,8 +82,10 @@ const Conference = () => {
               borderLeft: '4px solid var(--secondary)',
               boxShadow: '0 5px 15px rgba(0,0,0,0.5)'
             }}>
-              <p style={{ fontFamily: 'monospace', fontSize: '1.2rem', marginBottom: '1.5rem', color: '#e0e0e0' }}>"{c.text}"</p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--secondary)', textAlign: 'right', fontWeight: 'bold' }}>{c.date_display || c.date}</p>
+              <p style={{ fontFamily: 'monospace', fontSize: '1.2rem', marginBottom: '1.5rem', color: '#e0e0e0' }}>"{c.message}"</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--secondary)', textAlign: 'right', fontWeight: 'bold' }}>
+                {new Date(c.created_at).toLocaleDateString()}
+              </p>
             </div>
           ))}
           {confessions.length === 0 && <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)', gridColumn: '1/-1' }}>No confessions yet. Be brave!</p>}

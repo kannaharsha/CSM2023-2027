@@ -52,6 +52,8 @@ const Messages = () => {
       setTimeout(() => {
         setMessages(prev => prev.map(m => m.id === newMsg.id ? { ...m, isNew: false } : m));
       }, 1000);
+    } else if (error) {
+      alert("Error posting message: " + error.message + "\n\n(If it says RLS violated, please disable Row Level Security in Supabase!)");
     }
   };
 
@@ -91,8 +93,7 @@ const Messages = () => {
               options={[
                 { value: 'Appreciation', label: 'Appreciation 🌟' },
                 { value: 'Funny', label: 'Funny 😂' },
-                { value: 'Memory', label: 'Memory 📸' },
-                { value: 'Confession', label: 'Confession 🤫' }
+                { value: 'Memory', label: 'Memory 📸' }
               ]}
               value={formData.category}
               onChange={(val) => setFormData({ ...formData, category: val })}

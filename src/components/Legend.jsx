@@ -1,17 +1,30 @@
-import React, { useState, useMemo } from 'react';
-import { students } from '../data/students';
+import React, { useState, useMemo, useEffect } from 'react';
+import { localDB } from '../lib/localDB';
 
 const Legend = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      setLoading(true);
+      const { data } = await localDB.from('students').select('*');
+      if (data) setStudents(data);
+      setLoading(false);
+    };
+    fetchStudents();
+  }, []);
+
   const filteredStudents = useMemo(() => {
     return students.filter(s => 
       s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
       s.id.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [searchTerm]);
+  }, [searchTerm, students]);
 
   const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
   
@@ -59,9 +72,11 @@ const Legend = () => {
         ))}
       </div>
 
-      {filteredStudents.length === 0 && (
-        <p style={{ color: 'rgba(255,255,255,0.5)', marginTop: '2rem' }}>No legends found matching your search.</p>
-      )}
+      {loading ? (
+        <p style={{ color: 'rgba(255,255,255,0.5)', marginTop: '2rem', textAlign: 'center' }}>Loading legends from database...</p>
+      ) : filteredStudents.length === 0 ? (
+        <p style={{ color: 'rgba(255,255,255,0.5)', marginTop: '2rem', textAlign: 'center' }}>No legends found matching your search.</p>
+      ) : null}
 
       {totalPages > 1 && (
         <div style={{ display: 'flex', gap: '1rem', marginTop: '3rem', alignItems: 'center' }}>
