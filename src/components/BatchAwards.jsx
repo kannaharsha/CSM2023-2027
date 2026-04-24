@@ -125,9 +125,8 @@ const BatchAwards = () => {
       {!loading && (
         <div className="reveal active" style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <button 
-            className="btn primary float" 
+            className="btn primary float results-toggle-btn" 
             onClick={() => setShowResults(!showResults)}
-            style={{ padding: '1rem 3rem', fontSize: '1.1rem' }}
           >
             {showResults ? 'Hide Leaderboard' : 'Show Voting Results'}
           </button>
@@ -159,7 +158,7 @@ const BatchAwards = () => {
                 zIndex: categories.length - idx
               }}>
                 
-                <h3 style={{ color: '#fff', textAlign: 'center', fontSize: '1.2rem', marginBottom: '1.5rem', fontFamily: 'var(--font-display)' }}>{category}</h3>
+                <h3 className="award-card-title">{category}</h3>
                 
                 <div className="award-results-container">
                   {/* Your Vote Summary (Top) */}
