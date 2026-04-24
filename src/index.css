@@ -20,11 +20,18 @@
   scroll-behavior: smooth;
 }
 
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
   font-family: var(--font-main);
-  overflow-x: hidden;
   line-height: 1.6;
 }
 
@@ -38,8 +45,8 @@ h1, h2, h3, h4, h5, h6 {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   z-index: -2;
   background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15), transparent 50%),
               radial-gradient(circle at 0% 100%, rgba(14, 165, 233, 0.1), transparent 50%),
@@ -51,8 +58,8 @@ h1, h2, h3, h4, h5, h6 {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   z-index: -1;
   background-image: 
     linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
@@ -413,8 +420,8 @@ section {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background: rgba(0,0,0,0.7);
   backdrop-filter: blur(5px);
   z-index: 1400;
@@ -645,6 +652,7 @@ section {
   .navbar-container {
     width: 100%;
     border-radius: 0;
+    right: -100%;
   }
 
   .nav-link {
@@ -658,8 +666,13 @@ section {
   }
   
   .legend-grid {
+    display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 1rem;
+    overflow-x: visible;
+  }
+  .legend-grid > div {
+    min-width: auto;
   }
   
   .awards-grid {
@@ -677,5 +690,293 @@ section {
   
   .form-control {
     padding: 0.8rem 1rem;
+  }
+}
+
+/* Custom Select Component */
+.custom-select-container {
+  position: relative;
+  width: 100%;
+  font-family: var(--font-main);
+  z-index: 10;
+}
+
+.custom-select-button {
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: #fff;
+  font-family: var(--font-main);
+  outline: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+}
+
+.custom-select-button:hover, .custom-select-button.open {
+  border-color: var(--primary);
+  background: rgba(0,0,0,0.6);
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+}
+
+.custom-select-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  background: rgba(20, 20, 30, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(139, 92, 246, 0.2);
+  max-height: 250px;
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* Custom scrollbar for dropdown */
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) transparent;
+}
+
+.custom-select-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-select-dropdown::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 3px;
+}
+
+.custom-select-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.custom-select-option {
+  padding: 0.8rem 1.2rem;
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-select-option:last-child {
+  border-bottom: none;
+}
+
+.custom-select-option:hover, .custom-select-option.selected {
+  background: rgba(139, 92, 246, 0.2);
+  color: #fff;
+  padding-left: 1.5rem;
+}
+
+/* =========================================
+   Memory Lane Gallery Enhancements
+   ========================================= */
+
+.memory-lane-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.memory-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 3rem;
+  /* Dynamic padding allows the first and last card to perfectly snap to the center of the screen on laptops/tablets */
+  padding: 2rem calc(50% - min(40%, 350px)) 4rem calc(50% - min(40%, 350px));
+  width: 100%;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  cursor: ew-resize;
+  scroll-behavior: smooth;
+}
+
+.memory-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.memory-nav-btn {
+  position: absolute;
+  top: calc(50% - 2rem);
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(10, 10, 15, 0.8);
+  border: 1px solid var(--primary);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.memory-nav-btn.left { left: 1rem; }
+.memory-nav-btn.right { right: 1rem; }
+
+.memory-nav-btn:hover {
+  background: var(--primary);
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 0 30px var(--primary);
+}
+
+.memory-nav-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.memory-card-wrapper {
+  scroll-snap-align: center;
+  flex: 0 0 auto;
+  width: 80%;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.memory-card {
+  height: 65vh;
+  max-height: 700px;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 24px;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.memory-card:hover {
+  transform: scale(1.03) translateY(-10px);
+  box-shadow: 0 25px 50px rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.memory-img-container {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #050508;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.memory-img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.memory-card:hover .memory-img-container img {
+  transform: scale(1.08);
+}
+
+.memory-img-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+
+.memory-card-footer {
+  padding: 1.5rem 0 0.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.memory-card-title {
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.memory-card-number {
+  color: var(--secondary);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+
+/* Mobile adjustments for Android / iPhones */
+@media (max-width: 768px) {
+  /* Switch back to a vertical scroll on mobile */
+  .memory-carousel {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scroll-snap-type: y mandatory !important;
+    padding: 1rem 0 !important;
+    gap: 2rem !important;
+    cursor: default !important;
+    max-height: 80vh; /* Allow scrolling inside the section */
+  }
+
+  /* Hide custom left/right buttons on mobile */
+  .memory-nav-btn {
+    display: none !important;
+  }
+
+  .memory-card-wrapper {
+    width: 90%;
+    max-width: 100%;
+  }
+
+  .memory-card {
+    height: 60vh; /* Shorter card for mobile */
+    padding: 1rem;
+    border-radius: 16px;
+  }
+
+  /* Disable extreme hover animations on mobile for better touch experience */
+  .memory-card:hover {
+    transform: none;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .memory-card:hover .memory-img-container img {
+    transform: none;
+  }
+
+  .memory-card-title {
+    font-size: 1.1rem;
+  }
+}
+
+/* Tablet / Small Laptop specifics */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .memory-card {
+    height: 55vh; /* Keep it compact on tablets to prevent vertical overflow */
+  }
+  .memory-nav-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
   }
 }

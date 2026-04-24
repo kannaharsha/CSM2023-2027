@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { students } from '../data/students';
 import { localDB } from '../lib/localDB';
+import CustomSelect from './CustomSelect';
 
 const BatchAwards = () => {
   const categories = [
@@ -14,6 +15,11 @@ const BatchAwards = () => {
   const [myVotes, setMyVotes] = useState({});
   const [loading, setLoading] = useState(true);
   const [voterId, setVoterId] = useState('');
+  const [showResults, setShowResults] = useState(false);
+
+  const totalVotes = Object.values(votes).reduce((sum, categoryVotes) => {
+    return sum + Object.values(categoryVotes).reduce((a, b) => a + b, 0);
+  }, 0);
 
   useEffect(() => {
     // Initialize Voter ID
@@ -78,19 +84,13 @@ const BatchAwards = () => {
     }
   };
 
-  const getWinner = (category) => {
-    if (!votes[category]) return null;
-    let max = 0;
-    let winnerId = null;
-    for (const [id, count] of Object.entries(votes[category])) {
-      if (count > max) {
-        max = count;
-        winnerId = id;
-      }
-    }
-    if (max === 0 || !winnerId) return null;
-    const winner = students.find(s => s.id === winnerId);
-    return winner ? { ...winner, count: max } : null;
+  const getTopResults = (category) => {
+    if (!votes[category]) return [];
+    const sorted = Object.entries(votes[category]).sort((a, b) => b[1] - a[1]);
+    return sorted.slice(0, 3).map(([id, count]) => {
+      const student = students.find(s => s.id === id);
+      return student ? { ...student, count } : null;
+    }).filter(Boolean);
   };
 
   const getStudent = (id) => students.find(s => s.id === id);
@@ -98,7 +98,24 @@ const BatchAwards = () => {
   return (
     <section id="awards">
       <h2 className="section-title text-gradient reveal">Batch Awards</h2>
-      <p className="section-subtitle reveal">Vote for your friends and see the live leaderboard! 🏆</p>
+      <p className="section-subtitle reveal">Vote for your friends and see the leaderboard! 🏆</p>
+
+      {!loading && (
+        <div className="reveal active" style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <button 
+            className="btn primary float" 
+            onClick={() => setShowResults(!showResults)}
+            style={{ padding: '1rem 3rem', fontSize: '1.1rem' }}
+          >
+            {showResults ? 'Hide Leaderboard' : 'Show Voting Results'}
+          </button>
+          {showResults && (
+            <p className="pop-in" style={{ marginTop: '1rem', color: 'var(--secondary)', fontFamily: 'var(--font-mono)', fontWeight: 'bold' }}>
+              Total Awards Given: {totalVotes}
+            </p>
+          )}
+        </div>
+      )}
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '3rem' }}>
@@ -107,7 +124,7 @@ const BatchAwards = () => {
       ) : (
         <div className="grid-container awards-grid">
           {categories.map((category, idx) => {
-            const winner = getWinner(category);
+            const topResults = getTopResults(category);
             const mySelectedId = myVotes[category];
             const mySelectedStudent = mySelectedId ? getStudent(mySelectedId) : null;
 
@@ -116,25 +133,42 @@ const BatchAwards = () => {
                 display: 'flex', flexDirection: 'column', 
                 animationDelay: `${(idx % 3) * 0.2}s`,
                 borderTop: '3px solid var(--secondary)',
-                position: 'relative'
+                position: 'relative',
+                zIndex: categories.length - idx
               }}>
                 
                 <h3 style={{ color: '#fff', textAlign: 'center', fontSize: '1.2rem', marginBottom: '1.5rem', fontFamily: 'var(--font-display)' }}>{category}</h3>
                 
                 <div className="award-flex-container">
-                  {/* Current Leader */}
-                  <div style={{ flex: 1, textAlign: 'center' }}>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--secondary)', textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 'bold' }}>Current Leader</p>
-                    {winner ? (
-                      <div className="pop-in">
-                        <div className="avatar-wrapper" style={{ width: '75px', height: '75px', minWidth: '75px', minHeight: '75px', border: '2px solid rgba(255,215,0,0.8)', boxShadow: '0 0 10px rgba(255,215,0,0.4)', background: 'rgba(0,0,0,0.3)' }}>
-                          <img src={winner.image} alt={winner.name} style={{ borderRadius: '50%' }} />
-                        </div>
-                        <p style={{ fontSize: '0.9rem', fontWeight: 'bold', marginTop: '0.5rem', color: '#fff' }}>{winner.name}</p>
-                        <p style={{ fontSize: '0.8rem', color: 'gold' }}>{winner.count} votes</p>
+                  {/* Results section */}
+                  <div style={{ flex: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '130px' }}>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--secondary)', textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                      {showResults ? 'Leaderboard' : 'Results'}
+                    </p>
+                    
+                    {!showResults ? (
+                      <div className="pop-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem' }}>
+                        <span style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔒</span>
+                        Hidden until revealed
+                      </div>
+                    ) : topResults.length > 0 ? (
+                      <div className="pop-in" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
+                        {topResults.map((res, i) => (
+                          <div key={res.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: i === 0 ? 1 : 0.7, fontSize: i === 0 ? '1rem' : '0.85rem' }}>
+                            <span style={{ color: i === 0 ? 'gold' : i === 1 ? 'silver' : '#cd7f32' }}>
+                              {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
+                            </span>
+                            <span style={{ color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
+                              {res.name}
+                            </span>
+                            <span style={{ color: 'var(--secondary)' }}>({res.count})</span>
+                          </div>
+                        ))}
                       </div>
                     ) : (
-                      <div style={{ height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}>No votes yet</div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}>
+                        No votes yet
+                      </div>
                     )}
                   </div>
 
@@ -156,17 +190,12 @@ const BatchAwards = () => {
                   </div>
                 </div>
 
-                <select 
-                  className="form-control" 
-                  value={mySelectedId || ""}
-                  onChange={(e) => handleVote(category, e.target.value)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <option value="" disabled>Select your nominee...</option>
-                  {students.map(s => (
-                    <option key={s.id} value={s.id}>{s.name} ({s.id})</option>
-                  ))}
-                </select>
+                <CustomSelect 
+                  options={students.map(s => ({ value: s.id, label: `${s.name} (${s.id})` }))}
+                  value={mySelectedId}
+                  onChange={(val) => handleVote(category, val)}
+                  placeholder="Select your nominee..."
+                />
               </div>
             );
           })}

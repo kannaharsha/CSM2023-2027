@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { localDB } from '../lib/localDB';
+import CustomSelect from './CustomSelect';
 
 const Messages = () => {
   const [messages, setMessages] = useState([]);
@@ -86,11 +87,17 @@ const Messages = () => {
             </div>
           </div>
           <div style={{ marginBottom: '1.5rem' }}>
-            <select name="category" className="form-control" value={formData.category} onChange={handleChange}>
-              <option value="Appreciation">Appreciation 🌟</option>
-              <option value="Funny">Funny 😂</option>
-              <option value="Memory">Memory 📸</option>
-            </select>
+            <CustomSelect 
+              options={[
+                { value: 'Appreciation', label: 'Appreciation 🌟' },
+                { value: 'Funny', label: 'Funny 😂' },
+                { value: 'Memory', label: 'Memory 📸' },
+                { value: 'Confession', label: 'Confession 🤫' }
+              ]}
+              value={formData.category}
+              onChange={(val) => setFormData({ ...formData, category: val })}
+              placeholder="Select Category"
+            />
           </div>
           <div style={{ marginBottom: '1.5rem' }}>
             <textarea name="message" className="form-control" value={formData.message} onChange={handleChange} rows="4" placeholder="Write your message here..." required></textarea>

@@ -42,7 +42,7 @@ const GiftPreloader = ({ onOpen }) => {
   return (
     <div style={{
       position: 'fixed',
-      top: 0, left: 0, width: '100vw', height: '100vh',
+      top: 0, left: 0, width: '100%', height: '100%',
       background: 'radial-gradient(circle at center, #1a1025 0%, #020204 100%)',
       zIndex: 9999,
       display: 'flex',

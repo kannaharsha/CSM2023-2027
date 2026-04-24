@@ -7,14 +7,14 @@ const Home = () => {
       {/* Dynamic graphic orb */}
       <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '40vw', height: '40vw', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%)', filter: 'blur(50px)', zIndex: 0, animation: 'pulse-bg 4s infinite alternate' }}></div>
 
-      <div className="reveal active" style={{ zIndex: 1, position: 'relative' }}>
+      <div className="reveal active" style={{ zIndex: 1, position: 'relative', paddingTop: '4rem' }}>
         <p style={{ fontFamily: 'var(--font-mono)', letterSpacing: '4px', color: 'var(--secondary)', marginBottom: '1rem', textTransform: 'uppercase' }}>
           Welcome to the End Game
         </p>
         
         <h1 className="glitch" data-text="CLASS OF 2023 - 2027" style={{ 
-          fontSize: 'clamp(3rem, 8vw, 7rem)', 
-          lineHeight: '1.1',
+          fontSize: 'clamp(2rem, 8vw, 7rem)', 
+          lineHeight: '1.2',
           marginBottom: '1rem',
           color: '#fff',
           textShadow: '0 0 20px rgba(255,255,255,0.2)'

@@ -1,26 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { localDB } from '../lib/localDB';
 
 const Gallery = () => {
+  // Photos that should always appear first (in exact order)
+  const girlPhotos = [
+    '/images/Memory_Lane/IMG_6179.jpg',
+  ];
+
+  // Automatically detect all images in the Memory_Lane folder!
+  // If you add or delete photos in the folder, this will update automatically.
+  const allImageModules = import.meta.glob('/public/images/Memory_Lane/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}', { eager: true });
+  const allImagesFromFolder = Object.keys(allImageModules).map(path => path.replace('/public', ''));
+
+  // The rest of the images
+  const otherPhotos = allImagesFromFolder.filter(img => !girlPhotos.includes(img));
+
+  // Helper to shuffle an array
+  const shuffle = (array) => [...array].sort(() => Math.random() - 0.5);
+
+  // Combine them: Girls first (exact order), then the rest (randomized)
   const defaultImages = [
-    '/images/Class_members/23331A4201.jpeg',
-    '/images/Class_members/23331A4202.jpeg',
-    '/images/Class_members/23331A4203.jpeg',
-    '/images/Class_members/23331A4204.jpg',
-    '/images/Class_members/23331A4205.jpeg',
-    '/images/Class_members/23331A4206.jpeg',
-    '/images/Class_members/23331A4207.jpg',
-    '/images/Class_members/23331A4208.png',
-    '/images/Class_members/23331A4209.png',
-    '/images/Class_members/23331A4210.jpeg',
-    '/images/Class_members/23331A4211.jpeg',
-    '/images/Class_members/23331A4212.jpeg'
+    ...girlPhotos,
+    ...shuffle(otherPhotos)
   ];
 
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const carouselRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (carouselRef.current) {
+      const scrollAmount = window.innerWidth > 768 ? 600 : window.innerWidth * 0.85; 
+      carouselRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
+    // Clear the local browser database of any uploaded test photos
+    localStorage.removeItem('mock_db_gallery');
     fetchGallery();
   }, []);
 
@@ -103,29 +120,45 @@ const Gallery = () => {
             <p style={{ color: 'rgba(255,255,255,0.5)' }}>Developing photos...</p>
          </div>
       ) : (
-        <div className="grid-container gallery-grid">
-          {images.map((imgSrc, idx) => (
-            <div key={idx} className="reveal float" style={{ animationDelay: `${(idx % 4) * 0.1}s` }}>
-              <div className="glass-panel" style={{ 
-                padding: '1rem', 
-                background: '#fff', 
-                borderRadius: '8px',
-                transform: `rotate(${Math.random() * 6 - 3}deg)`,
-                transition: 'transform 0.4s ease',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1) rotate(0deg)'}
-              onMouseOut={(e) => e.currentTarget.style.transform = `rotate(${Math.random() * 6 - 3}deg)`}
-              >
-                <div style={{ width: '100%', aspectRatio: '1', overflow: 'hidden', background: '#000' }}>
-                  <img src={imgSrc} alt={`Memory ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+        <div className="memory-lane-wrapper">
+          <button 
+            className="memory-nav-btn left"
+            onClick={() => scroll('left')}
+            aria-label="Scroll Left"
+          >
+            &#10094;
+          </button>
+
+          <button 
+            className="memory-nav-btn right"
+            onClick={() => scroll('right')}
+            aria-label="Scroll Right"
+          >
+            &#10095;
+          </button>
+
+          <div className="memory-carousel" ref={carouselRef}>
+            {images.map((imgSrc, idx) => (
+            <div key={idx} className="reveal float memory-card-wrapper" style={{ animationDelay: `${(idx % 4) * 0.1}s` }}>
+              <div className="glass-panel memory-card">
+                <div className="memory-img-container">
+                  <img src={imgSrc} alt={`Memory ${idx}`} loading="lazy" />
+                  {/* Glowing inner shadow overlay */}
+                  <div className="memory-img-overlay"></div>
                 </div>
-                <div style={{ padding: '1rem 0 0.5rem 0', textAlign: 'center', color: '#333', fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>
-                  {idx < defaultImages.length ? 'Classic Memory' : 'Added by Batchmate'}
+                
+                <div className="memory-card-footer">
+                  <div className="memory-card-title">
+                    {idx < defaultImages.length ? 'Golden Memory ✨' : 'Batchmate Memory 📸'}
+                  </div>
+                  <div className="memory-card-number">
+                    Memory #{idx + 1}
+                  </div>
                 </div>
               </div>
             </div>
           ))}
+        </div>
         </div>
       )}
     </section>
