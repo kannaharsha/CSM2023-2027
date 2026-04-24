@@ -376,8 +376,9 @@ section {
 
 /* Responsive Grids & Components */
 .awards-grid {
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 3rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2.5rem;
+  width: 100%;
 }
 
 .award-results-container {
@@ -408,6 +409,7 @@ section {
   display: flex;
   align-items: center;
   gap: 0.8rem;
+  overflow: hidden;
 }
 
 .mini-avatar {
@@ -428,6 +430,10 @@ section {
   font-size: 0.95rem;
   font-weight: 600;
   color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 
 .none-text {
@@ -484,6 +490,10 @@ section {
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
+  gap: 1rem;
+  overflow: hidden;
+  position: relative;
+  flex-wrap: wrap;
 }
 
 .leaderboard-item:hover {
@@ -496,6 +506,9 @@ section {
   display: flex;
   align-items: center;
   gap: 0.8rem;
+  min-width: 0;
+  flex: 1;
+  flex-wrap: wrap;
 }
 
 .rank-badge {
@@ -523,6 +536,7 @@ section {
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .item-avatar img {
@@ -535,18 +549,26 @@ section {
   font-size: 0.9rem;
   font-weight: 600;
   color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .item-id {
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.4);
   font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .vote-count {
   font-weight: 800;
   color: var(--primary);
   font-size: 1.1rem;
+  flex-shrink: 0;
+  text-align: right;
 }
 
 .vote-text {
@@ -568,6 +590,7 @@ section {
   height: 50px;
   border: 2px solid gold;
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+  flex-shrink: 0;
 }
 
 .winner-name {
@@ -584,36 +607,48 @@ section {
 
 .winner-card {
   position: relative;
+  width: 100%;
 }
 
 .winner-card::after {
   content: "WINNER";
   position: absolute;
-  top: -10px;
-  right: -10px;
+  top: -8px;
+  right: 5px;
   background: gold;
   color: black;
   font-size: 0.6rem;
   font-weight: 900;
   padding: 2px 8px;
   border-radius: 4px;
-  transform: rotate(15deg);
+  transform: rotate(10deg);
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 1;
 }
 
 /* Premium Submit Button */
 .btn-submit-premium {
-  padding: 1.5rem 5rem !important;
-  font-size: 1.3rem !important;
-  background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent)) !important;
-  background-size: 200% 200% !important;
-  border: none !important;
-  box-shadow: 0 15px 35px rgba(139, 92, 246, 0.4) !important;
-  animation: bg-shift 5s ease infinite, pulse-premium 2s infinite !important;
+  padding: 1.5rem 5rem;
+  font-size: 1.3rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+  background-size: 200% 200%;
+  border: none;
+  box-shadow: 0 15px 35px rgba(139, 92, 246, 0.4);
+  animation: bg-shift 5s ease infinite, pulse-premium 2s infinite;
   overflow: hidden;
   display: flex;
   align-items: center;
   gap: 1rem;
+  max-width: 100%;
+}
+
+@media (max-width: 480px) {
+  .btn-submit-premium {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    width: 90%;
+    margin: 0 auto;
+  }
 }
 
 .btn-submit-premium .btn-icon {
@@ -828,6 +863,8 @@ section {
   .btn {
     padding: 0.8rem 1.5rem;
     font-size: 0.9rem;
+    width: auto;
+    max-width: 100%;
   }
   
   .gallery-grid {
@@ -846,8 +883,8 @@ section {
   }
 
   .awards-grid {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
   }
 
   .grid-container {
@@ -932,8 +969,75 @@ section {
   }
   
   .awards-grid {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .leaderboard-item {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .item-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .winner-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .vote-count {
+    font-size: 0.9rem;
+  }
+
+  .winner-count {
+    font-size: 1.1rem;
+  }
+  
+  .leaderboard-item.winner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 1.2rem 0.8rem;
+  }
+
+  .leaderboard-item.winner .item-left {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .leaderboard-item.winner .item-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .leaderboard-item.winner .vote-count {
+    align-self: center;
+    margin-top: 0.2rem;
+  }
+
+  .winner-name {
+    font-size: 0.95rem;
+  }
+
+  .winner-count {
+    font-size: 1rem;
+  }
+
+  .winner-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .winner-card::after {
+    top: -5px;
+    right: 2px;
+    font-size: 0.5rem;
+    padding: 1px 5px;
   }
   
   .grid-container {
@@ -1236,3 +1340,30 @@ section {
     font-size: 1.5rem;
   }
 }
+
+.results-toggle-btn {
+  padding: 1rem 3rem;
+  font-size: 1.1rem;
+}
+
+.award-card-title {
+  color: #fff;
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-display);
+}
+
+@media (max-width: 480px) {
+  .results-toggle-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+    width: 90%;
+  }
+  
+  .award-card-title {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+}
+
