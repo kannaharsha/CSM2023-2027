@@ -13,17 +13,21 @@ const Legend = () => {
     const fetchStudents = async () => {
       setLoading(true);
       const { data } = await localDB.from('students').select('*');
-      if (data) setStudents(data);
+      if (data) {
+        const sortedData = [...data].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true, sensitivity: 'base' }));
+        setStudents(sortedData);
+      }
       setLoading(false);
     };
     fetchStudents();
   }, []);
 
   const filteredStudents = useMemo(() => {
-    return students.filter(s => 
-      s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      s.id.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    return students
+      .filter(s => 
+        s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        s.id.toLowerCase().includes(searchTerm.toLowerCase())
+      );
   }, [searchTerm, students]);
 
   const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
