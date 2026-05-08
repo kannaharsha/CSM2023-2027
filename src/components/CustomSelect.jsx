@@ -2,12 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 
 const CustomSelect = ({ options, value, onChange, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
+        setSearchTerm('');
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -15,6 +17,10 @@ const CustomSelect = ({ options, value, onChange, placeholder }) => {
   }, []);
 
   const selectedOption = options.find(opt => opt.value === value);
+
+  const filteredOptions = options.filter(opt => 
+    opt.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="custom-select-container" ref={dropdownRef}>
@@ -35,21 +41,31 @@ const CustomSelect = ({ options, value, onChange, placeholder }) => {
       </button>
 
       <div className={`custom-select-dropdown ${isOpen ? 'open' : ''}`}>
-        {options.map((opt) => (
+        <div className="custom-select-search">
+          <input 
+            type="text" 
+            placeholder="Search number or name..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+        {filteredOptions.map((opt) => (
           <div 
             key={opt.value} 
             className={`custom-select-option ${value === opt.value ? 'selected' : ''}`}
             onClick={() => {
               onChange(opt.value);
               setIsOpen(false);
+              setSearchTerm('');
             }}
           >
             {opt.label}
           </div>
         ))}
-        {options.length === 0 && (
+        {filteredOptions.length === 0 && (
           <div className="custom-select-option" style={{ opacity: 0.5 }}>
-            No options available
+            No results found
           </div>
         )}
       </div>
