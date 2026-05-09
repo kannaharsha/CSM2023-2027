@@ -40,18 +40,117 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-/* Premium Animated Background */
+/* Premium Animated Background - Space & Love Edition */
 .bg-mesh {
   position: fixed;
   top: 0;
   left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -3;
+  background-color: var(--bg-color);
+  overflow: hidden;
+}
+
+.bg-mesh::before, .bg-mesh::after, .bg-mesh-blob, .bg-mesh-blob-2 {
+  content: "";
+  position: absolute;
+  width: 80vw;
+  height: 80vw;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.12;
+}
+
+.bg-mesh::before {
+  top: 0;
+  left: 0;
+  background: radial-gradient(circle, #a78bfa 0%, transparent 60%);
+  animation: blob-sweep-right 30s infinite linear;
+}
+
+.bg-mesh::after {
+  top: 30%;
+  left: 0;
+  background: radial-gradient(circle, #38bdf8 0%, transparent 60%);
+  animation: blob-sweep-right 38s infinite linear;
+  animation-delay: -15s;
+}
+
+.bg-mesh-blob {
+  bottom: 0;
+  left: 20%;
+  background: radial-gradient(circle, #fb7185 0%, transparent 60%);
+  animation: blob-sweep-up 35s infinite linear;
+  animation-delay: -5s;
+}
+
+.bg-mesh-blob-2 {
+  bottom: 0;
+  left: 50%;
+  background: radial-gradient(circle, #34d399 0%, transparent 60%);
+  animation: blob-sweep-up 40s infinite linear;
+  animation-delay: -20s;
+  opacity: 0.08;
+}
+
+@keyframes blob-sweep-right {
+  0% { transform: translateX(-100vw) translateY(10vh); }
+  100% { transform: translateX(100vw) translateY(-10vh); }
+}
+
+@keyframes blob-sweep-up {
+  0% { transform: translateY(100vh) translateX(-10vw); }
+  100% { transform: translateY(-100vh) translateX(10vw); }
+}
+
+/* Space Stars Effect */
+.space-stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+  pointer-events: none;
+  background-image: 
+    radial-gradient(1px 1px at 25px 5px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 50px 25px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 125px 20px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 50px 75px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 15px 125px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 110px 140px, #fff, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  animation: twinkle 6s infinite alternate, star-pan 120s infinite linear;
+  opacity: 0.25;
+}
+
+.space-stars::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  z-index: -2;
-  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15), transparent 50%),
-              radial-gradient(circle at 0% 100%, rgba(14, 165, 233, 0.1), transparent 50%),
-              radial-gradient(circle at 100% 100%, rgba(244, 63, 94, 0.1), transparent 50%);
-  background-color: var(--bg-color);
+  background-image: 
+    radial-gradient(1px 1px at 75px 15px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 100px 105px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 20px 85px, #fff, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 300px 300px;
+  animation: twinkle 8s infinite alternate-reverse, star-pan 180s infinite linear;
+  opacity: 0.15;
+}
+
+@keyframes star-pan {
+  0% { background-position: 0px 0px; }
+  100% { background-position: 1200px 0px; }
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.1; transform: scale(1); }
+  100% { opacity: 0.7; transform: scale(1.02); }
 }
 
 .bg-grid {
@@ -67,7 +166,7 @@ h1, h2, h3, h4, h5, h6 {
   background-size: 50px 50px;
   transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
   animation: grid-move 20s linear infinite;
-  opacity: 0.3;
+  opacity: 0.15;
 }
 
 @keyframes grid-move {
@@ -164,14 +263,21 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0.4;
   pointer-events: none;
   z-index: -1;
-  animation: floatUp 15s infinite linear;
+  animation: floatStraightUp 15s infinite linear;
 }
 
-@keyframes floatUp {
-  0% { transform: translateY(100vh) scale(0); opacity: 0; }
-  10% { opacity: 0.5; }
-  90% { opacity: 0.5; }
-  100% { transform: translateY(-20vh) scale(1); opacity: 0; }
+@keyframes floatDiagonal {
+  0% { transform: translate(-10vw, 110vh) scale(0.5) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translate(110vw, -10vh) scale(1.2) rotate(45deg); opacity: 0; }
+}
+
+@keyframes floatStraightUp {
+  0% { transform: translateY(110vh) scale(0.5) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-10vh) scale(1.2) rotate(-45deg); opacity: 0; }
 }
 
 .glass-panel:hover {
@@ -1393,3 +1499,42 @@ section {
   }
 }
 
+.animated-regd {
+  display: inline-block;
+  animation: pulse-glow 2s infinite alternate;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+@keyframes pulse-glow {
+  0% {
+    text-shadow: 0 0 5px currentColor;
+    opacity: 0.8;
+  }
+  100% {
+    text-shadow: 0 0 15px currentColor, 0 0 25px currentColor;
+    opacity: 1;
+  }
+}
+
+.particle-text {
+  animation: particle-assemble 3s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+  opacity: 0;
+}
+
+@keyframes particle-assemble {
+  0% {
+    letter-spacing: 2em;
+    filter: blur(30px);
+    opacity: 0;
+    transform: scale(1.5) translateY(-50px);
+    text-shadow: 0 0 50px var(--primary), 0 0 100px var(--secondary);
+  }
+  100% {
+    letter-spacing: normal;
+    filter: blur(0);
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    text-shadow: 0 0 20px rgba(255,255,255,0.2);
+  }
+}

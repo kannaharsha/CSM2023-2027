@@ -13,21 +13,23 @@ import Outro from './components/Outro';
 import GiftPreloader from './components/GiftPreloader';
 
 const Particles = () => {
-  const particles = Array.from({ length: 30 });
-  const floatingItems = ['❤️', '✨', '⭐', '💖', '💫'];
+  const particles = Array.from({ length: 40 });
+  const floatingItems = ['❤️', '✨', '⭐', '💖', '💫', '🌸', '🦋'];
+  const colors = ['#a78bfa', '#38bdf8', '#fb7185', '#34d399', '#facc15', '#fb923c'];
 
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1, pointerEvents: 'none', overflow: 'hidden' }}>
       {particles.map((_, i) => (
         <div key={i} style={{
           position: 'absolute',
-          color: 'var(--accent)',
-          fontSize: `${Math.random() * 15 + 10}px`,
+          color: colors[i % colors.length],
+          fontSize: `${Math.random() * 20 + 10}px`,
           left: `${Math.random() * 100}%`,
           top: `${Math.random() * 100}%`,
-          opacity: 0.25,
-          animation: `floatUp ${Math.random() * 10 + 10}s infinite linear`,
-          animationDelay: `${Math.random() * 10}s`
+          opacity: Math.random() * 0.4 + 0.1,
+          animation: `${i % 2 === 0 ? 'floatStraightUp' : 'floatDiagonal'} ${Math.random() * 12 + 10}s infinite ease-in-out`,
+          animationDelay: `${Math.random() * 10}s`,
+          filter: 'drop-shadow(0 0 5px currentColor)'
         }}>
           {floatingItems[Math.floor(Math.random() * floatingItems.length)]}
         </div>
@@ -75,9 +77,13 @@ function App() {
     <>
       {!hasOpenedGift && <GiftPreloader onOpen={() => setHasOpenedGift(true)} />}
       
-      <div style={{ opacity: hasOpenedGift ? 1 : 0, transition: 'opacity 1s ease', visibility: hasOpenedGift ? 'visible' : 'hidden' }}>
+      <div style={{ opacity: hasOpenedGift ? 1 : 0, transition: 'opacity 1.5s ease-in-out', visibility: hasOpenedGift ? 'visible' : 'hidden' }}>
         <Particles />
-        <div className="bg-mesh"></div>
+        <div className="space-stars"></div>
+        <div className="bg-mesh">
+          <div className="bg-mesh-blob"></div>
+          <div className="bg-mesh-blob-2"></div>
+        </div>
         <div className="bg-grid"></div>
         <Navbar />
         <Home />

@@ -65,15 +65,21 @@ const Legend = () => {
       </div>
 
       <div className="grid-container legend-grid">
-        {currentStudents.map((student, idx) => (
-          <div key={student.id} className="glass-panel pop-in" style={{ padding: '1.2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div className="portrait-wrapper" style={{ marginBottom: '1rem' }}>
+        {currentStudents.map((student, idx) => {
+          const cardColors = ['#a78bfa', '#38bdf8', '#fb7185', '#34d399', '#facc15', '#fb923c', '#38bdf8'];
+          const cardColor = cardColors[idx % cardColors.length];
+          return (
+          <div key={student.id} className="glass-panel pop-in" style={{ 
+            padding: '1.2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center',
+            borderTop: `3px solid ${cardColor}`
+          }}>
+            <div className="portrait-wrapper" style={{ marginBottom: '1rem', border: `2px solid ${cardColor}`, boxShadow: `0 0 15px ${cardColor}40` }}>
               <img src={student.image} alt={student.name} loading="lazy" />
             </div>
-            <h4 style={{ color: 'var(--secondary)', fontSize: '1.2rem', marginBottom: '0.2rem', fontFamily: 'var(--font-display)' }}>{student.name}</h4>
-            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', fontFamily: 'var(--font-mono)' }}>#{student.id}</p>
+            <h4 style={{ color: cardColor, fontSize: '1.2rem', marginBottom: '0.2rem', fontFamily: 'var(--font-display)' }}>{student.name}</h4>
+            <p className="animated-regd" style={{ fontSize: '0.9rem', color: cardColor, fontFamily: 'var(--font-mono)' }}>{student.id}</p>
           </div>
-        ))}
+        )})}
       </div>
 
       {loading ? (

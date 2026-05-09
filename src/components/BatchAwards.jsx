@@ -151,17 +151,20 @@ const BatchAwards = () => {
             const topResults = getTopResults(category);
             const mySelectedId = myVotes[category];
             const mySelectedStudent = mySelectedId ? getStudent(mySelectedId) : null;
+            
+            const cardColors = ['#a78bfa', '#38bdf8', '#fb7185', '#34d399', '#facc15', '#fb923c', '#38bdf8'];
+            const cardColor = cardColors[idx % cardColors.length];
 
             return (
               <div key={idx} className="glass-panel reveal float" style={{ 
                 display: 'flex', flexDirection: 'column', 
                 animationDelay: `${(idx % 3) * 0.2}s`,
-                borderTop: '3px solid var(--secondary)',
+                borderTop: `3px solid ${cardColor}`,
                 position: 'relative',
                 zIndex: categories.length - idx
               }}>
                 
-                <h3 className="award-card-title">{category}</h3>
+                <h3 className="award-card-title" style={{ color: cardColor }}>{category}</h3>
                 
                 <div className="award-results-container">
                   {/* Your Vote Summary (Top) */}
@@ -194,7 +197,7 @@ const BatchAwards = () => {
                                 </div>
                                 <div className="item-info">
                                   <div className="item-name winner-name">{result.name}</div>
-                                  <div className="item-id">#{result.id}</div>
+                                  <div className="item-id animated-regd" style={{ color: 'gold' }}>{result.id}</div>
                                 </div>
                               </div>
                               <div className="vote-count winner-count">
